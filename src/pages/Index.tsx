@@ -9,7 +9,6 @@ const Index = () => {
   const [hasSeenTrial, setHasSeenTrial] = useState(false);
 
   useEffect(() => {
-    // Check if user has already seen the trial popup
     const trialSeen = localStorage.getItem("nutrigen_trial_seen");
     if (trialSeen) {
       setHasSeenTrial(true);
@@ -18,38 +17,31 @@ const Index = () => {
 
   const handleSplashComplete = () => {
     setShowSplash(false);
-    // Show trial popup if user hasn't seen it
     if (!hasSeenTrial) {
       setTimeout(() => setShowTrialPopup(true), 100);
     }
   };
-
-  // Trial popup only has start trial - no close option
 
   const handleStartTrial = () => {
     setShowTrialPopup(false);
     localStorage.setItem("nutrigen_trial_seen", "true");
     localStorage.setItem("nutrigen_trial_started", new Date().toISOString());
     setHasSeenTrial(true);
-    // TODO: Navigate to onboarding
   };
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Splash Screen */}
       <AnimatePresence mode="wait">
         {showSplash && (
           <SplashScreen onComplete={handleSplashComplete} />
         )}
       </AnimatePresence>
 
-      {/* Trial Popup - only Start Trial option */}
       <TrialPopup
         isOpen={showTrialPopup}
         onStartTrial={handleStartTrial}
       />
 
-      {/* Main Content - Placeholder for now */}
       {!showSplash && (
         <div className="flex min-h-screen flex-col items-center justify-center px-6 text-center">
           <div className="max-w-md">
