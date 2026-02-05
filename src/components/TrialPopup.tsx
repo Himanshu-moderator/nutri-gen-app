@@ -1,14 +1,13 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Sparkles, Clock, Zap } from "lucide-react";
+import { Sparkles, Clock, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface TrialPopupProps {
   isOpen: boolean;
-  onClose: () => void;
   onStartTrial: () => void;
 }
 
-const TrialPopup = ({ isOpen, onClose, onStartTrial }: TrialPopupProps) => {
+const TrialPopup = ({ isOpen, onStartTrial }: TrialPopupProps) => {
   const features = [
     { icon: Sparkles, text: "AI-powered meal suggestions" },
     { icon: Clock, text: "Smart pantry tracking" },
@@ -19,13 +18,12 @@ const TrialPopup = ({ isOpen, onClose, onStartTrial }: TrialPopupProps) => {
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
+          {/* Backdrop - no click to close */}
           <motion.div
             className="fixed inset-0 z-50 bg-foreground/60 backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
           />
 
           {/* Modal */}
@@ -37,14 +35,6 @@ const TrialPopup = ({ isOpen, onClose, onStartTrial }: TrialPopupProps) => {
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
           >
             <div className="relative overflow-hidden rounded-3xl bg-card shadow-soft-lg">
-              {/* Close button */}
-              <button
-                onClick={onClose}
-                className="absolute right-4 top-4 z-10 rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-              >
-                <X className="h-5 w-5" />
-              </button>
-
               {/* Gradient header */}
               <div className="gradient-primary px-6 pb-8 pt-12 text-center">
                 <motion.div
@@ -84,7 +74,7 @@ const TrialPopup = ({ isOpen, onClose, onStartTrial }: TrialPopupProps) => {
                   transition={{ delay: 0.25 }}
                   className="mb-6 text-center text-muted-foreground"
                 >
-                  Get personalized meal plans powered by AI. No credit card required to start.
+                  Get personalized meal plans powered by AI. Start your free trial to unlock all features.
                 </motion.p>
 
                 {/* Features */}
@@ -109,12 +99,11 @@ const TrialPopup = ({ isOpen, onClose, onStartTrial }: TrialPopupProps) => {
                   ))}
                 </motion.div>
 
-                {/* Actions */}
+                {/* Single Action - Start Trial */}
                 <motion.div
                   initial={{ y: 10, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.35 }}
-                  className="space-y-3"
                 >
                   <Button
                     onClick={onStartTrial}
@@ -122,13 +111,6 @@ const TrialPopup = ({ isOpen, onClose, onStartTrial }: TrialPopupProps) => {
                   >
                     Start Free Trial
                   </Button>
-
-                  <button
-                    onClick={onClose}
-                    className="w-full py-3 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-                  >
-                    Maybe later
-                  </button>
                 </motion.div>
               </div>
             </div>

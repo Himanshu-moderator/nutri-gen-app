@@ -43,10 +43,9 @@ const Index = () => {
         )}
       </AnimatePresence>
 
-      {/* Trial Popup */}
+      {/* Trial Popup - only Start Trial option */}
       <TrialPopup
         isOpen={showTrialPopup}
-        onClose={handleTrialClose}
         onStartTrial={handleStartTrial}
       />
 
