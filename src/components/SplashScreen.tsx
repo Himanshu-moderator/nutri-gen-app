@@ -12,9 +12,9 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
       initial={{ opacity: 1 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.6 }}
       onAnimationComplete={() => {
-        setTimeout(onComplete, 300);
+        setTimeout(onComplete, 800);
       }}
     >
       <motion.div
@@ -22,8 +22,8 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ 
-          duration: 0.3, 
-          ease: [0.16, 1, 0.3, 1] 
+          duration: 0.6, 
+          ease: [0.22, 1, 0.36, 1] 
         }}
       >
         {/* Logo Icon */}
@@ -31,7 +31,7 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
           className="relative"
           initial={{ rotate: -20 }}
           animate={{ rotate: 0 }}
-          transition={{ duration: 0.3, ease: "easeOut" }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         >
           <div className="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-glow-lg">
             <Utensils className="w-10 h-10 text-white" strokeWidth={2.5} />
@@ -41,10 +41,10 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
           <motion.div
             className="absolute inset-0 rounded-2xl bg-white/30"
             initial={{ scale: 1, opacity: 0.5 }}
-            animate={{ scale: 1.2, opacity: 0 }}
+            animate={{ scale: 1.3, opacity: 0 }}
             transition={{ 
-              duration: 0.6, 
-              ease: "easeOut",
+              duration: 1, 
+              ease: [0.22, 1, 0.36, 1],
               repeat: 0
             }}
           />
@@ -53,9 +53,9 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
         {/* Brand Name */}
         <motion.h1
           className="text-4xl font-bold text-white tracking-tight"
-          initial={{ y: 10, opacity: 0 }}
+          initial={{ y: 15, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
+          transition={{ duration: 0.5, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
         >
           NutriGen
         </motion.h1>
@@ -63,9 +63,9 @@ const SplashScreen = ({ onComplete }: SplashScreenProps) => {
         {/* Tagline */}
         <motion.p
           className="text-white/80 text-sm font-medium"
-          initial={{ y: 10, opacity: 0 }}
+          initial={{ y: 15, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.3, delay: 0.15 }}
+          transition={{ duration: 0.5, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
         >
           Eat smarter, not harder
         </motion.p>
