@@ -24,11 +24,7 @@ const Index = () => {
     }
   };
 
-  const handleTrialClose = () => {
-    setShowTrialPopup(false);
-    localStorage.setItem("nutrigen_trial_seen", "true");
-    setHasSeenTrial(true);
-  };
+  // Trial popup only has start trial - no close option
 
   const handleStartTrial = () => {
     setShowTrialPopup(false);
@@ -47,10 +43,9 @@ const Index = () => {
         )}
       </AnimatePresence>
 
-      {/* Trial Popup */}
+      {/* Trial Popup - only Start Trial option */}
       <TrialPopup
         isOpen={showTrialPopup}
-        onClose={handleTrialClose}
         onStartTrial={handleStartTrial}
       />
 
