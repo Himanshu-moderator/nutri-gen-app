@@ -24,11 +24,7 @@ const Index = () => {
     }
   };
 
-  const handleTrialClose = () => {
-    setShowTrialPopup(false);
-    localStorage.setItem("nutrigen_trial_seen", "true");
-    setHasSeenTrial(true);
-  };
+  // Trial popup only has start trial - no close option
 
   const handleStartTrial = () => {
     setShowTrialPopup(false);
