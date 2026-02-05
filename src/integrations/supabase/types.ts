@@ -14,7 +14,186 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      health_streaks: {
+        Row: {
+          created_at: string
+          current_streak: number | null
+          id: string
+          last_activity_date: string | null
+          longest_streak: number | null
+          streak_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_streak?: number | null
+          id?: string
+          last_activity_date?: string | null
+          longest_streak?: number | null
+          streak_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_streak?: number | null
+          id?: string
+          last_activity_date?: string | null
+          longest_streak?: number | null
+          streak_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      meal_logs: {
+        Row: {
+          calories: number | null
+          carbs_g: number | null
+          fats_g: number | null
+          id: string
+          logged_at: string
+          meal_name: string
+          meal_type: string
+          notes: string | null
+          protein_g: number | null
+          user_id: string
+        }
+        Insert: {
+          calories?: number | null
+          carbs_g?: number | null
+          fats_g?: number | null
+          id?: string
+          logged_at?: string
+          meal_name: string
+          meal_type: string
+          notes?: string | null
+          protein_g?: number | null
+          user_id: string
+        }
+        Update: {
+          calories?: number | null
+          carbs_g?: number | null
+          fats_g?: number | null
+          id?: string
+          logged_at?: string
+          meal_name?: string
+          meal_type?: string
+          notes?: string | null
+          protein_g?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      pantry_items: {
+        Row: {
+          added_at: string
+          category: string | null
+          expiry_date: string | null
+          id: string
+          image_url: string | null
+          name: string
+          quantity: number | null
+          unit: string | null
+          user_id: string
+        }
+        Insert: {
+          added_at?: string
+          category?: string | null
+          expiry_date?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          quantity?: number | null
+          unit?: string | null
+          user_id: string
+        }
+        Update: {
+          added_at?: string
+          category?: string | null
+          expiry_date?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          quantity?: number | null
+          unit?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          activity_level: string | null
+          allergies: string[] | null
+          avatar_url: string | null
+          breakfast_time: string | null
+          created_at: string
+          daily_calorie_target: number | null
+          date_of_birth: string | null
+          dietary_preferences: string[] | null
+          dinner_time: string | null
+          full_name: string | null
+          gender: string | null
+          health_goal: string | null
+          height_cm: number | null
+          id: string
+          is_subscribed: boolean | null
+          lunch_time: string | null
+          onboarding_completed: boolean | null
+          trial_ends_at: string | null
+          trial_started_at: string | null
+          updated_at: string
+          user_id: string
+          weight_kg: number | null
+        }
+        Insert: {
+          activity_level?: string | null
+          allergies?: string[] | null
+          avatar_url?: string | null
+          breakfast_time?: string | null
+          created_at?: string
+          daily_calorie_target?: number | null
+          date_of_birth?: string | null
+          dietary_preferences?: string[] | null
+          dinner_time?: string | null
+          full_name?: string | null
+          gender?: string | null
+          health_goal?: string | null
+          height_cm?: number | null
+          id?: string
+          is_subscribed?: boolean | null
+          lunch_time?: string | null
+          onboarding_completed?: boolean | null
+          trial_ends_at?: string | null
+          trial_started_at?: string | null
+          updated_at?: string
+          user_id: string
+          weight_kg?: number | null
+        }
+        Update: {
+          activity_level?: string | null
+          allergies?: string[] | null
+          avatar_url?: string | null
+          breakfast_time?: string | null
+          created_at?: string
+          daily_calorie_target?: number | null
+          date_of_birth?: string | null
+          dietary_preferences?: string[] | null
+          dinner_time?: string | null
+          full_name?: string | null
+          gender?: string | null
+          health_goal?: string | null
+          height_cm?: number | null
+          id?: string
+          is_subscribed?: boolean | null
+          lunch_time?: string | null
+          onboarding_completed?: boolean | null
+          trial_ends_at?: string | null
+          trial_started_at?: string | null
+          updated_at?: string
+          user_id?: string
+          weight_kg?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
