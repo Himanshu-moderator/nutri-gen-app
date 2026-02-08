@@ -114,7 +114,7 @@ const Pantry = () => {
 
   return (
     <AppLayout>
-      <div className="px-4 pt-6 pb-4 space-y-6">
+      <div className="px-4 sm:px-6 lg:px-8 pt-6 pb-4 space-y-6 max-w-3xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
@@ -133,7 +133,7 @@ const Pantry = () => {
                 <Plus className="h-5 w-5" />
               </Button>
             </DialogTrigger>
-            <DialogContent className="mx-4 rounded-2xl">
+            <DialogContent className="mx-4 sm:mx-auto rounded-2xl max-w-md">
               <DialogHeader>
                 <DialogTitle>Add Item</DialogTitle>
               </DialogHeader>

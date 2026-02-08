@@ -49,7 +49,7 @@ const Profile = () => {
 
   return (
     <AppLayout>
-      <div className="px-4 pt-6 pb-4 space-y-6">
+      <div className="px-4 sm:px-6 lg:px-8 pt-6 pb-4 space-y-6 max-w-3xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
