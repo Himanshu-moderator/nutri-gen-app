@@ -35,6 +35,8 @@ interface RecipeDetailSheetProps {
   recipe: RecipeDetail | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onAddToToday?: () => void;
+  showAddButton?: boolean;
 }
 
 const difficultyColors = {
