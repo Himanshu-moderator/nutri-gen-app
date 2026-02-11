@@ -161,7 +161,7 @@ const Dashboard = () => {
         >
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-base sm:text-lg font-semibold">Today's Meals</h2>
-            <Button variant="ghost" size="sm" className="text-primary text-xs sm:text-sm">
+            <Button variant="ghost" size="sm" className="text-primary text-xs sm:text-sm" onClick={() => navigate("/meal-history")}>
               See All <ChevronRight className="h-4 w-4 ml-1" />
             </Button>
           </div>
