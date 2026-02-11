@@ -247,3 +247,115 @@ export const recipeDetails: Record<string, RecipeDetail> = {
     tags: ["Spicy", "Thai"],
   },
 };
+
+// Recipe details for quick meals in AddMealSheet
+export const quickMealRecipes: Record<string, RecipeDetail> = {
+  "Protein Shake": {
+    name: "Protein Shake", emoji: "🥤", calories: 180, prepTime: 2, servings: 1, difficulty: "Easy",
+    description: "A quick and creamy post-workout shake packed with protein.",
+    ingredients: ["1 scoop whey protein", "1 cup almond milk", "1/2 banana", "Ice cubes", "1 tsp honey (optional)"],
+    steps: [
+      { step: 1, instruction: "Add almond milk, protein powder, and banana to a blender." },
+      { step: 2, instruction: "Add ice cubes and blend until smooth." },
+      { step: 3, instruction: "Pour into a glass and enjoy immediately." },
+    ],
+    macros: { protein: 25, carbs: 10, fats: 3 }, tags: ["High Protein", "Quick", "Post-Workout"],
+  },
+  "Greek Yogurt & Berries": {
+    name: "Greek Yogurt & Berries", emoji: "🫐", calories: 150, prepTime: 3, servings: 1, difficulty: "Easy",
+    description: "Creamy Greek yogurt topped with fresh mixed berries and a drizzle of honey.",
+    ingredients: ["1 cup Greek yogurt", "1/2 cup mixed berries", "1 tbsp honey", "1 tbsp granola (optional)"],
+    steps: [
+      { step: 1, instruction: "Spoon Greek yogurt into a bowl." },
+      { step: 2, instruction: "Top with fresh mixed berries." },
+      { step: 3, instruction: "Drizzle with honey and add granola if desired." },
+    ],
+    macros: { protein: 12, carbs: 18, fats: 4 }, tags: ["Probiotic", "Quick", "Vegetarian"],
+  },
+  "Trail Mix": {
+    name: "Trail Mix", emoji: "🥜", calories: 220, prepTime: 1, servings: 1, difficulty: "Easy",
+    description: "A crunchy mix of nuts, seeds, and dried fruit for quick energy.",
+    ingredients: ["1/4 cup almonds", "2 tbsp pumpkin seeds", "2 tbsp dried cranberries", "1 tbsp dark chocolate chips"],
+    steps: [
+      { step: 1, instruction: "Combine all ingredients in a small container." },
+      { step: 2, instruction: "Shake to mix and enjoy on the go." },
+    ],
+    macros: { protein: 6, carbs: 24, fats: 14 }, tags: ["Portable", "Energy Boost"],
+  },
+  "Banana & Peanut Butter": {
+    name: "Banana & Peanut Butter", emoji: "🍌", calories: 280, prepTime: 2, servings: 1, difficulty: "Easy",
+    description: "A classic combo of banana slices with creamy peanut butter.",
+    ingredients: ["1 large banana", "2 tbsp peanut butter", "Cinnamon to taste"],
+    steps: [
+      { step: 1, instruction: "Slice the banana into rounds." },
+      { step: 2, instruction: "Spread or dip each slice in peanut butter." },
+      { step: 3, instruction: "Sprinkle with cinnamon and enjoy." },
+    ],
+    macros: { protein: 8, carbs: 34, fats: 16 }, tags: ["Quick", "Natural"],
+  },
+  "Avocado Toast": {
+    name: "Avocado Toast", emoji: "🥑", calories: 320, prepTime: 5, servings: 1, difficulty: "Easy",
+    description: "Simple smashed avocado on toasted bread with seasonings.",
+    ingredients: ["1 slice whole grain bread", "1/2 avocado", "Salt, pepper & chili flakes", "Lemon juice"],
+    steps: [
+      { step: 1, instruction: "Toast the bread until golden." },
+      { step: 2, instruction: "Mash avocado with salt, pepper, and lemon juice." },
+      { step: 3, instruction: "Spread on toast and finish with chili flakes." },
+    ],
+    macros: { protein: 8, carbs: 28, fats: 18 }, tags: ["Vegetarian", "Quick"],
+  },
+  "Smoothie Bowl": {
+    name: "Smoothie Bowl", emoji: "🥣", calories: 350, prepTime: 8, servings: 1, difficulty: "Easy",
+    description: "A thick, vibrant smoothie bowl loaded with toppings.",
+    ingredients: ["1 frozen banana", "1/2 cup frozen berries", "1/4 cup almond milk", "Toppings: granola, chia seeds, coconut flakes"],
+    steps: [
+      { step: 1, instruction: "Blend frozen banana, berries, and almond milk until thick." },
+      { step: 2, instruction: "Pour into a bowl." },
+      { step: 3, instruction: "Add toppings: granola, chia seeds, and coconut flakes." },
+    ],
+    macros: { protein: 10, carbs: 52, fats: 8 }, tags: ["Vegan", "Fiber Rich"],
+  },
+  "Hummus & Veggies": {
+    name: "Hummus & Veggies", emoji: "🥕", calories: 160, prepTime: 3, servings: 1, difficulty: "Easy",
+    description: "Crunchy vegetables with creamy hummus for dipping.",
+    ingredients: ["1/3 cup hummus", "1 carrot, cut into sticks", "1/2 cucumber, sliced", "1/2 bell pepper, sliced"],
+    steps: [
+      { step: 1, instruction: "Wash and cut all vegetables into sticks or slices." },
+      { step: 2, instruction: "Scoop hummus into a small bowl." },
+      { step: 3, instruction: "Arrange veggies around the hummus and dip away." },
+    ],
+    macros: { protein: 6, carbs: 20, fats: 8 }, tags: ["Vegan", "Low Cal"],
+  },
+  "Rice Cake with Almond Butter": {
+    name: "Rice Cake with Almond Butter", emoji: "🍘", calories: 190, prepTime: 2, servings: 1, difficulty: "Easy",
+    description: "Light and crunchy rice cake topped with smooth almond butter.",
+    ingredients: ["2 rice cakes", "1.5 tbsp almond butter", "Sliced banana or honey (optional)"],
+    steps: [
+      { step: 1, instruction: "Spread almond butter evenly over rice cakes." },
+      { step: 2, instruction: "Top with banana slices or a drizzle of honey if desired." },
+    ],
+    macros: { protein: 5, carbs: 22, fats: 10 }, tags: ["Gluten Free", "Quick"],
+  },
+  "Egg & Cheese Wrap": {
+    name: "Egg & Cheese Wrap", emoji: "🌯", calories: 380, prepTime: 7, servings: 1, difficulty: "Easy",
+    description: "A warm, hearty wrap filled with scrambled eggs and melted cheese.",
+    ingredients: ["2 large eggs", "1 flour tortilla", "1/4 cup shredded cheese", "Salt & pepper", "Hot sauce (optional)"],
+    steps: [
+      { step: 1, instruction: "Scramble eggs in a non-stick pan with salt and pepper." },
+      { step: 2, instruction: "Warm the tortilla in a dry pan." },
+      { step: 3, instruction: "Place eggs in tortilla, add cheese, and wrap tightly." },
+    ],
+    macros: { protein: 22, carbs: 30, fats: 18 }, tags: ["High Protein", "Quick"],
+  },
+  "Fruit Salad": {
+    name: "Fruit Salad", emoji: "🍇", calories: 120, prepTime: 5, servings: 1, difficulty: "Easy",
+    description: "A refreshing mix of seasonal fruits with a hint of lime.",
+    ingredients: ["1/2 cup strawberries", "1/2 cup grapes", "1 kiwi, sliced", "1/2 cup pineapple chunks", "Lime juice & mint"],
+    steps: [
+      { step: 1, instruction: "Wash and cut all fruits into bite-sized pieces." },
+      { step: 2, instruction: "Toss together in a bowl with a squeeze of lime." },
+      { step: 3, instruction: "Garnish with fresh mint leaves." },
+    ],
+    macros: { protein: 2, carbs: 30, fats: 1 }, tags: ["Vegan", "Low Cal", "Refreshing"],
+  },
+};
