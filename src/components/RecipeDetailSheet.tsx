@@ -45,7 +45,7 @@ const difficultyColors = {
   Hard: "text-destructive bg-destructive/10",
 };
 
-const RecipeDetailSheet = ({ recipe, open, onOpenChange }: RecipeDetailSheetProps) => {
+const RecipeDetailSheet = ({ recipe, open, onOpenChange, onAddToToday, showAddButton }: RecipeDetailSheetProps) => {
   if (!recipe) return null;
 
   return (
