@@ -106,6 +106,14 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/meal-history"
+        element={
+          <ProtectedRoute>
+            <MealHistory />
+          </ProtectedRoute>
+        }
+      />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

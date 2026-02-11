@@ -244,6 +244,20 @@ const Dashboard = () => {
         recipe={selectedRecipe}
         open={recipeSheetOpen}
         onOpenChange={setRecipeSheetOpen}
+        showAddButton
+        onAddToToday={() => {
+          if (selectedRecipe) {
+            handleMealAdded({
+              name: selectedRecipe.name,
+              calories: selectedRecipe.calories,
+              type: "meal",
+              protein: selectedRecipe.macros.protein,
+              carbs: selectedRecipe.macros.carbs,
+              fats: selectedRecipe.macros.fats,
+            });
+            setRecipeSheetOpen(false);
+          }
+        }}
       />
     </AppLayout>
   );
