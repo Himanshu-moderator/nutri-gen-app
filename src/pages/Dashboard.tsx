@@ -16,6 +16,7 @@ import { recipeDetails } from "@/data/mockRecipes";
 import type { RecipeDetail } from "@/components/RecipeDetailSheet";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { profile, trialDaysRemaining } = useProfile();
   const [addMealOpen, setAddMealOpen] = useState(false);
