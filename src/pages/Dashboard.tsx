@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Flame, Award, ChevronRight, Plus } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,6 +16,7 @@ import { recipeDetails } from "@/data/mockRecipes";
 import type { RecipeDetail } from "@/components/RecipeDetailSheet";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { profile, trialDaysRemaining } = useProfile();
   const [addMealOpen, setAddMealOpen] = useState(false);
@@ -161,7 +163,7 @@ const Dashboard = () => {
         >
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-base sm:text-lg font-semibold">Today's Meals</h2>
-            <Button variant="ghost" size="sm" className="text-primary text-xs sm:text-sm">
+            <Button variant="ghost" size="sm" className="text-primary text-xs sm:text-sm" onClick={() => navigate("/meal-history")}>
               See All <ChevronRight className="h-4 w-4 ml-1" />
             </Button>
           </div>
@@ -244,6 +246,20 @@ const Dashboard = () => {
         recipe={selectedRecipe}
         open={recipeSheetOpen}
         onOpenChange={setRecipeSheetOpen}
+        showAddButton
+        onAddToToday={() => {
+          if (selectedRecipe) {
+            handleMealAdded({
+              name: selectedRecipe.name,
+              calories: selectedRecipe.calories,
+              type: "meal",
+              protein: selectedRecipe.macros.protein,
+              carbs: selectedRecipe.macros.carbs,
+              fats: selectedRecipe.macros.fats,
+            });
+            setRecipeSheetOpen(false);
+          }
+        }}
       />
     </AppLayout>
   );
