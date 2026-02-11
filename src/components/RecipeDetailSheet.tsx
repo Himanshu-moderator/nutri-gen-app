@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { X, Clock, ChefHat, Flame, Users, ChevronRight } from "lucide-react";
+import { X, Clock, ChefHat, Flame, Users, ChevronRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
