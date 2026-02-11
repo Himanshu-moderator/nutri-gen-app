@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Flame, Award, ChevronRight, Plus } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
