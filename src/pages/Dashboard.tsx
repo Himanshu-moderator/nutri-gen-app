@@ -189,6 +189,16 @@ const Dashboard = () => {
               time={profile?.dinner_time || "7:00 PM"}
               suggested
               onClick={() => handleMealCardClick("Suggested: Salmon with Veggies")}
+              onAddToToday={() => {
+                handleMealAdded({
+                  name: "Salmon with Veggies",
+                  calories: 550,
+                  type: "dinner",
+                  protein: 45,
+                  carbs: 35,
+                  fats: 22,
+                });
+              }}
             />
             {/* Dynamically added meals */}
             {extraMeals.map((meal, index) => (

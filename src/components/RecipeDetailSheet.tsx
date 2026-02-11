@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { X, Clock, ChefHat, Flame, Users, ChevronRight } from "lucide-react";
+import { X, Clock, ChefHat, Flame, Users, ChevronRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -35,6 +35,8 @@ interface RecipeDetailSheetProps {
   recipe: RecipeDetail | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onAddToToday?: () => void;
+  showAddButton?: boolean;
 }
 
 const difficultyColors = {
@@ -43,7 +45,7 @@ const difficultyColors = {
   Hard: "text-destructive bg-destructive/10",
 };
 
-const RecipeDetailSheet = ({ recipe, open, onOpenChange }: RecipeDetailSheetProps) => {
+const RecipeDetailSheet = ({ recipe, open, onOpenChange, onAddToToday, showAddButton }: RecipeDetailSheetProps) => {
   if (!recipe) return null;
 
   return (
@@ -133,6 +135,19 @@ const RecipeDetailSheet = ({ recipe, open, onOpenChange }: RecipeDetailSheetProp
                 ))}
               </div>
             </div>
+
+            {/* Add to Today Button */}
+            {showAddButton && onAddToToday && (
+              <div className="sticky bottom-0 pt-2 pb-6">
+                <Button
+                  className="w-full h-12 rounded-2xl text-base font-semibold gap-2"
+                  onClick={onAddToToday}
+                >
+                  <Plus className="h-5 w-5" />
+                  Add to Today's Meals
+                </Button>
+              </div>
+            )}
 
             {/* Bottom spacing for safe area */}
             <div className="h-4" />
