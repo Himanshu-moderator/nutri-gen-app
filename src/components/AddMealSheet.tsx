@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Plus, Flame, Clock, ChefHat, Coffee, Sun, Moon, Cookie, Sandwich } from "lucide-react";
+import { Search, Plus, Flame, Clock, ChefHat, Coffee, Sun, Moon, Cookie, Sandwich, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -11,6 +11,9 @@ import {
 } from "@/components/ui/sheet";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import RecipeDetailSheet from "@/components/RecipeDetailSheet";
+import { quickMealRecipes } from "@/data/mockRecipes";
+import type { RecipeDetail } from "@/components/RecipeDetailSheet";
 
 interface QuickMeal {
   id: string;
@@ -53,6 +56,9 @@ interface AddMealSheetProps {
 const AddMealSheet = ({ open, onOpenChange, onMealAdded }: AddMealSheetProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState("snack");
+  const [selectedRecipe, setSelectedRecipe] = useState<RecipeDetail | null>(null);
+  const [recipeSheetOpen, setRecipeSheetOpen] = useState(false);
+  const [pendingMeal, setPendingMeal] = useState<QuickMeal | null>(null);
   const { toast } = useToast();
 
   const filteredMeals = quickMeals.filter((meal) =>
@@ -72,108 +78,141 @@ const AddMealSheet = ({ open, onOpenChange, onMealAdded }: AddMealSheetProps) =>
       title: "Meal added! 🎉",
       description: `${meal.name} (${meal.calories} cal) added as ${selectedType}`,
     });
+    setRecipeSheetOpen(false);
     onOpenChange(false);
     setSearchQuery("");
+    setPendingMeal(null);
+  };
+
+  const handleViewRecipe = (meal: QuickMeal) => {
+    const recipe = quickMealRecipes[meal.name];
+    if (recipe) {
+      setSelectedRecipe(recipe);
+      setPendingMeal(meal);
+      setRecipeSheetOpen(true);
+    }
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-[80vh] rounded-t-3xl p-0 overflow-hidden">
-        <div className="h-full overflow-y-auto">
-          <div className="px-5 sm:px-6 pt-6 pb-4 space-y-5">
-            <SheetHeader>
-              <SheetTitle className="text-xl font-bold text-left">Add a Meal</SheetTitle>
-              <p className="text-sm text-muted-foreground text-left">
-                Pick a meal type and search for recipes
-              </p>
-            </SheetHeader>
+    <>
+      <Sheet open={open} onOpenChange={onOpenChange}>
+        <SheetContent side="bottom" className="h-[80vh] rounded-t-3xl p-0 overflow-hidden">
+          <div className="h-full overflow-y-auto">
+            <div className="px-5 sm:px-6 pt-6 pb-4 space-y-5">
+              <SheetHeader>
+                <SheetTitle className="text-xl font-bold text-left">Add a Meal</SheetTitle>
+                <p className="text-sm text-muted-foreground text-left">
+                  Pick a meal type and search for recipes
+                </p>
+              </SheetHeader>
 
-            {/* Meal Type Selector */}
-            <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
-              {mealTypes.map((type) => (
-                <button
-                  key={type.value}
-                  onClick={() => setSelectedType(type.value)}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all shrink-0 ${
-                    selectedType === type.value
-                      ? "bg-primary text-primary-foreground shadow-glow"
-                      : "bg-muted text-muted-foreground hover:bg-muted/80"
-                  }`}
-                >
-                  <span>{type.emoji}</span>
-                  {type.label}
-                </button>
-              ))}
-            </div>
+              {/* Meal Type Selector */}
+              <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
+                {mealTypes.map((type) => (
+                  <button
+                    key={type.value}
+                    onClick={() => setSelectedType(type.value)}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all shrink-0 ${
+                      selectedType === type.value
+                        ? "bg-primary text-primary-foreground shadow-glow"
+                        : "bg-muted text-muted-foreground hover:bg-muted/80"
+                    }`}
+                  >
+                    <span>{type.emoji}</span>
+                    {type.label}
+                  </button>
+                ))}
+              </div>
 
-            {/* Search */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input
-                placeholder="Search recipes..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 h-12 rounded-xl"
-              />
-            </div>
+              {/* Search */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Input
+                  placeholder="Search recipes..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 h-12 rounded-xl"
+                />
+              </div>
 
-            {/* Results */}
-            <div className="space-y-2">
-              <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-                {searchQuery ? "Search Results" : "Popular Picks"}
-              </p>
-              <AnimatePresence mode="popLayout">
-                {filteredMeals.length === 0 ? (
-                  <div className="text-center py-8">
-                    <p className="text-muted-foreground text-sm">No meals found. Try a different search.</p>
-                  </div>
-                ) : (
-                  filteredMeals.map((meal, index) => (
-                    <motion.div
-                      key={meal.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      transition={{ delay: index * 0.03 }}
-                    >
-                      <Card
-                        className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer active:scale-[0.98]"
-                        onClick={() => handleAddMeal(meal)}
+              {/* Results */}
+              <div className="space-y-2">
+                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+                  {searchQuery ? "Search Results" : "Popular Picks"}
+                </p>
+                <AnimatePresence mode="popLayout">
+                  {filteredMeals.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-muted-foreground text-sm">No meals found. Try a different search.</p>
+                    </div>
+                  ) : (
+                    filteredMeals.map((meal, index) => (
+                      <motion.div
+                        key={meal.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        transition={{ delay: index * 0.03 }}
                       >
-                        <CardContent className="p-3 sm:p-4 flex items-center gap-3 sm:gap-4">
-                          <div className="text-3xl sm:text-4xl shrink-0">{meal.emoji}</div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold text-sm sm:text-base truncate">{meal.name}</h3>
-                            <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-muted-foreground mt-0.5">
-                              <span className="flex items-center gap-1">
-                                <Flame className="h-3.5 w-3.5 text-primary" />
-                                {meal.calories} cal
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Clock className="h-3.5 w-3.5" />
-                                {meal.prepTime}m
-                              </span>
+                        <Card
+                          className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer active:scale-[0.98]"
+                          onClick={() => handleViewRecipe(meal)}
+                        >
+                          <CardContent className="p-3 sm:p-4 flex items-center gap-3 sm:gap-4">
+                            <div className="text-3xl sm:text-4xl shrink-0">{meal.emoji}</div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold text-sm sm:text-base truncate">{meal.name}</h3>
+                              <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-muted-foreground mt-0.5">
+                                <span className="flex items-center gap-1">
+                                  <Flame className="h-3.5 w-3.5 text-primary" />
+                                  {meal.calories} cal
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <Clock className="h-3.5 w-3.5" />
+                                  {meal.prepTime}m
+                                </span>
+                              </div>
+                              <div className="flex gap-2 mt-1 text-xs text-muted-foreground">
+                                <span>P: {meal.protein}g</span>
+                                <span>C: {meal.carbs}g</span>
+                                <span>F: {meal.fats}g</span>
+                              </div>
                             </div>
-                            <div className="flex gap-2 mt-1 text-xs text-muted-foreground">
-                              <span>P: {meal.protein}g</span>
-                              <span>C: {meal.carbs}g</span>
-                              <span>F: {meal.fats}g</span>
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="rounded-full h-9 w-9 sm:h-10 sm:w-10 bg-primary/10 text-primary hover:bg-primary/20"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleAddMeal(meal);
+                                }}
+                              >
+                                <Plus className="h-4 w-4 sm:h-5 sm:w-5" />
+                              </Button>
                             </div>
-                          </div>
-                          <Button size="icon" variant="ghost" className="rounded-full shrink-0 h-9 w-9 sm:h-10 sm:w-10 bg-primary/10 text-primary hover:bg-primary/20">
-                            <Plus className="h-4 w-4 sm:h-5 sm:w-5" />
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  ))
-                )}
-              </AnimatePresence>
+                          </CardContent>
+                        </Card>
+                      </motion.div>
+                    ))
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
           </div>
-        </div>
-      </SheetContent>
-    </Sheet>
+        </SheetContent>
+      </Sheet>
+
+      <RecipeDetailSheet
+        recipe={selectedRecipe}
+        open={recipeSheetOpen}
+        onOpenChange={setRecipeSheetOpen}
+        showAddButton
+        onAddToToday={() => {
+          if (pendingMeal) handleAddMeal(pendingMeal);
+        }}
+      />
+    </>
   );
 };
 
