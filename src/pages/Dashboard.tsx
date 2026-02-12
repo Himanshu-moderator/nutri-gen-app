@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Flame, Award, ChevronRight, Plus } from "lucide-react";
+import { Flame, Award, ChevronRight, Plus, Droplets, TrendingUp } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import AppLayout from "@/components/AppLayout";
 import { useProfile } from "@/hooks/useProfile";
 import { useAuth } from "@/contexts/AuthContext";
@@ -22,6 +23,7 @@ const Dashboard = () => {
   const [addMealOpen, setAddMealOpen] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState<RecipeDetail | null>(null);
   const [recipeSheetOpen, setRecipeSheetOpen] = useState(false);
+  const [selectedMealLogged, setSelectedMealLogged] = useState(false);
 
   const [extraCalories, setExtraCalories] = useState(0);
   const [extraMeals, setExtraMeals] = useState<Array<{ name: string; calories: number; type: string }>>([]);
@@ -50,10 +52,11 @@ const Dashboard = () => {
     }));
   };
 
-  const handleMealCardClick = (mealName: string) => {
+  const handleMealCardClick = (mealName: string, isLogged: boolean = false) => {
     const recipe = recipeDetails[mealName];
     if (recipe) {
       setSelectedRecipe(recipe);
+      setSelectedMealLogged(isLogged);
       setRecipeSheetOpen(true);
     }
   };
@@ -75,14 +78,23 @@ const Dashboard = () => {
                 : "Let's crush your goals today"}
             </p>
           </div>
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-1.5 bg-secondary/10 text-secondary px-3 py-1.5 rounded-full"
-          >
-            <Flame className="h-4 w-4" />
-            <span className="text-sm font-semibold">7</span>
-          </motion.div>
+          <TooltipProvider delayDuration={200}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <motion.div
+                  whileHover={{ scale: 1.08 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center gap-1.5 bg-secondary/10 text-secondary px-3 py-1.5 rounded-full cursor-default"
+                >
+                  <Flame className="h-4 w-4" />
+                  <span className="text-sm font-semibold">7</span>
+                </motion.div>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="text-xs font-medium">
+                🔥 7-day streak! You've logged meals every day for a week.
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </motion.div>
 
         {/* Calorie Ring */}
@@ -174,7 +186,7 @@ const Dashboard = () => {
               calories={420}
               time="8:30 AM"
               logged
-              onClick={() => handleMealCardClick("Avocado Toast with Eggs")}
+              onClick={() => handleMealCardClick("Avocado Toast with Eggs", true)}
             />
             <MealCard
               type="lunch"
@@ -182,7 +194,7 @@ const Dashboard = () => {
               calories={380}
               time="12:45 PM"
               logged
-              onClick={() => handleMealCardClick("Grilled Chicken Salad")}
+              onClick={() => handleMealCardClick("Grilled Chicken Salad", true)}
             />
             <MealCard
               type="dinner"
@@ -190,7 +202,7 @@ const Dashboard = () => {
               calories={550}
               time={profile?.dinner_time || "7:00 PM"}
               suggested
-              onClick={() => handleMealCardClick("Suggested: Salmon with Veggies")}
+              onClick={() => handleMealCardClick("Suggested: Salmon with Veggies", false)}
               onAddToToday={() => {
                 handleMealAdded({
                   name: "Salmon with Veggies",
@@ -216,13 +228,58 @@ const Dashboard = () => {
           </div>
         </motion.div>
 
+        {/* Quick Stats Row */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35 }}
+          className="grid grid-cols-2 gap-3"
+        >
+          <TooltipProvider delayDuration={200}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Card className="border shadow-soft cursor-default hover:shadow-soft-lg transition-shadow">
+                  <CardContent className="p-3 sm:p-4 flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-info/10 flex items-center justify-center">
+                      <Droplets className="h-4.5 w-4.5 text-info" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Water</p>
+                      <p className="text-sm font-bold">5 / 8 glasses</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="text-xs">💧 Track your daily water intake — 3 more glasses to go!</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <TooltipProvider delayDuration={200}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Card className="border shadow-soft cursor-default hover:shadow-soft-lg transition-shadow">
+                  <CardContent className="p-3 sm:p-4 flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-secondary/10 flex items-center justify-center">
+                      <TrendingUp className="h-4.5 w-4.5 text-secondary" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Weekly Avg</p>
+                      <p className="text-sm font-bold">1,820 cal</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="text-xs">📊 Your average daily intake this week</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </motion.div>
+
         {/* Motivation Card */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <Card className="gradient-primary border-0 text-primary-foreground">
+          <Card className="gradient-primary border-0 text-primary-foreground shadow-glow">
             <CardContent className="p-4 flex items-center gap-4">
               <Award className="h-8 w-8 sm:h-10 sm:w-10 opacity-90 shrink-0" />
               <div>
@@ -246,7 +303,7 @@ const Dashboard = () => {
         recipe={selectedRecipe}
         open={recipeSheetOpen}
         onOpenChange={setRecipeSheetOpen}
-        showAddButton
+        showAddButton={!selectedMealLogged}
         onAddToToday={() => {
           if (selectedRecipe) {
             handleMealAdded({

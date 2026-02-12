@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Sparkles, Calendar, Search, Filter } from "lucide-react";
+import { ChevronLeft, ChevronRight, Sparkles, Calendar, Search, ArrowLeft } from "lucide-react";
 import { format, subDays, addDays, isToday, isSameDay } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,6 +56,7 @@ const aiPickMeals: HistoryMeal[] = [
 const categories = ["All", "Breakfast", "Lunch", "Dinner", "Snack", "Brunch"];
 
 const MealHistory = () => {
+  const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
@@ -73,11 +75,11 @@ const MealHistory = () => {
 
   const totalCalories = dayMeals.filter((m) => m.logged).reduce((sum, m) => sum + m.calories, 0);
 
-  const handleMealClick = (name: string, isSuggested?: boolean) => {
+  const handleMealClick = (name: string, isLogged?: boolean) => {
     const recipe = recipeDetails[name];
     if (recipe) {
       setSelectedRecipe(recipe);
-      setShowAddOnRecipe(!!isSuggested);
+      setShowAddOnRecipe(!isLogged);
       setRecipeSheetOpen(true);
     }
   };
@@ -104,6 +106,19 @@ const MealHistory = () => {
   return (
     <AppLayout>
       <div className="px-4 sm:px-6 lg:px-8 pt-6 pb-4 space-y-5 max-w-3xl mx-auto">
+        {/* Back Button */}
+        <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="gap-1.5 -ml-2 text-muted-foreground hover:text-foreground rounded-full"
+            onClick={() => navigate("/dashboard")}
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
+        </motion.div>
+
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="text-xl sm:text-2xl font-bold mb-1">Meal History</h1>
@@ -196,7 +211,7 @@ const MealHistory = () => {
                       time={meal.time}
                       logged={meal.logged}
                       suggested={meal.suggested}
-                      onClick={() => handleMealClick(meal.name, meal.suggested)}
+                      onClick={() => handleMealClick(meal.name, meal.logged)}
                       onAddToToday={meal.suggested ? () => {} : undefined}
                     />
                   ))}
