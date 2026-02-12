@@ -179,4 +179,27 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  /* Smooth page transitions */
+  .page-transition {
+    animation: fade-in 0.3s ease-out, slide-up 0.25s ease-out;
+  }
+}
+
+/* Subtle selection color */
+::selection {
+  background: hsl(var(--primary) / 0.2);
+  color: hsl(var(--foreground));
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Better focus styles */
+*:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+  border-radius: calc(var(--radius) - 4px);
 }
