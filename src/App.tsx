@@ -12,6 +12,8 @@ import Dashboard from "./pages/Dashboard";
 import Meals from "./pages/Meals";
 import Pantry from "./pages/Pantry";
 import Profile from "./pages/Profile";
+import EditProfile from "./pages/EditProfile";
+import Preferences from "./pages/Preferences";
 import MealHistory from "./pages/MealHistory";
 import NotFound from "./pages/NotFound";
 
@@ -103,6 +105,22 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <Profile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/edit-profile"
+        element={
+          <ProtectedRoute>
+            <EditProfile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/preferences"
+        element={
+          <ProtectedRoute>
+            <Preferences />
           </ProtectedRoute>
         }
       />

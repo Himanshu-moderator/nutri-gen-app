@@ -160,7 +160,7 @@ const Profile = () => {
             <CardContent className="p-0 divide-y divide-border">
               <button
                 className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
-                onClick={() => navigate("/onboarding")}
+                onClick={() => navigate("/edit-profile")}
               >
                 <div className="flex items-center gap-3">
                   <User className="h-5 w-5 text-muted-foreground" />
@@ -193,7 +193,7 @@ const Profile = () => {
 
               <button
                 className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
-                onClick={() => toast({ title: "Coming soon!", description: "Settings page will be available soon" })}
+                onClick={() => navigate("/preferences")}
               >
                 <div className="flex items-center gap-3">
                   <Settings className="h-5 w-5 text-muted-foreground" />
