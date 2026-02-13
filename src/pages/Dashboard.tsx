@@ -24,6 +24,7 @@ const Dashboard = () => {
   const [selectedRecipe, setSelectedRecipe] = useState<RecipeDetail | null>(null);
   const [recipeSheetOpen, setRecipeSheetOpen] = useState(false);
   const [selectedMealLogged, setSelectedMealLogged] = useState(false);
+  const [waterGlasses, setWaterGlasses] = useState(5);
 
   const [extraCalories, setExtraCalories] = useState(0);
   const [extraMeals, setExtraMeals] = useState<Array<{ name: string; calories: number; type: string }>>([]);
@@ -243,14 +244,25 @@ const Dashboard = () => {
                     <div className="w-9 h-9 rounded-xl bg-info/10 flex items-center justify-center">
                       <Droplets className="h-4.5 w-4.5 text-info" />
                     </div>
-                    <div>
+                    <div className="flex-1">
                       <p className="text-xs text-muted-foreground">Water</p>
-                      <p className="text-sm font-bold">5 / 8 glasses</p>
+                      <p className="text-sm font-bold">{waterGlasses} / 8 glasses</p>
                     </div>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => setWaterGlasses((prev) => Math.min(prev + 1, 8))}
+                      disabled={waterGlasses >= 8}
+                      className="w-7 h-7 rounded-full bg-info/15 hover:bg-info/25 flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      <Plus className="h-3.5 w-3.5 text-info" />
+                    </motion.button>
                   </CardContent>
                 </Card>
               </TooltipTrigger>
-              <TooltipContent side="bottom" className="text-xs">💧 Track your daily water intake — 3 more glasses to go!</TooltipContent>
+              <TooltipContent side="bottom" className="text-xs">
+                💧 {waterGlasses >= 8 ? "Great job! You've hit your water goal!" : `${8 - waterGlasses} more glasses to go!`}
+              </TooltipContent>
             </Tooltip>
           </TooltipProvider>
           <TooltipProvider delayDuration={200}>
