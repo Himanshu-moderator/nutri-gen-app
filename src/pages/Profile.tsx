@@ -58,6 +58,17 @@ const Profile = () => {
     improve_health: "Improve Health",
   };
 
+  const dietLabels: Record<string, string> = {
+    vegetarian: "Vegetarian",
+    vegan: "Vegan",
+    keto: "Keto",
+    paleo: "Paleo",
+    gluten_free: "Gluten Free",
+    dairy_free: "Dairy Free",
+    halal: "Halal",
+    kosher: "Kosher",
+  };
+
   return (
     <AppLayout>
       <div className="px-4 sm:px-6 lg:px-8 pt-6 pb-4 space-y-6 max-w-3xl mx-auto">
@@ -146,6 +157,40 @@ const Profile = () => {
             </CardContent>
           </Card>
         </motion.div>
+
+        {/* Dietary & Meal Info */}
+        {(profile?.dietary_preferences?.length || profile?.breakfast_time) && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+          >
+            <Card>
+              <CardContent className="p-4 space-y-3">
+                {profile?.dietary_preferences && profile.dietary_preferences.length > 0 && (
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1.5">Diet</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {profile.dietary_preferences.map((pref) => (
+                        <span
+                          key={pref}
+                          className="inline-flex items-center px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium capitalize"
+                        >
+                          {dietLabels[pref] || pref.replace(/_/g, " ")}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                  <span>🌅 {profile?.breakfast_time?.slice(0, 5) || "08:00"}</span>
+                  <span>☀️ {profile?.lunch_time?.slice(0, 5) || "12:30"}</span>
+                  <span>🌙 {profile?.dinner_time?.slice(0, 5) || "19:00"}</span>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
 
         {/* Settings */}
         <motion.div
