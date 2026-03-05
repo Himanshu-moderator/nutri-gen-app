@@ -25,6 +25,7 @@ const Dashboard = () => {
   const [recipeSheetOpen, setRecipeSheetOpen] = useState(false);
   const [selectedMealLogged, setSelectedMealLogged] = useState(false);
   const [waterGlasses, setWaterGlasses] = useState(5);
+  const [showMacros, setShowMacros] = useState(true);
 
   const [extraCalories, setExtraCalories] = useState(0);
   const [extraMeals, setExtraMeals] = useState<Array<{ name: string; calories: number; type: string }>>([]);
