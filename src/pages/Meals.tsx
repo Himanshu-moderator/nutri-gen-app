@@ -84,13 +84,29 @@ const Meals = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10 pr-12 h-11 sm:h-12 rounded-xl"
           />
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute right-1 top-1/2 -translate-y-1/2"
-          >
-            <Filter className="h-5 w-5" />
-          </Button>
+        </motion.div>
+
+        {/* Difficulty Filter */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="flex gap-2"
+        >
+          {(["All", "Easy", "Medium", "Hard"] as const).map((level) => (
+            <Button
+              key={level}
+              variant={difficultyFilter === level ? "default" : "outline"}
+              size="sm"
+              className="rounded-full text-xs"
+              onClick={() => setDifficultyFilter(level)}
+            >
+              {level === "Easy" && "🟢 "}
+              {level === "Medium" && "🟡 "}
+              {level === "Hard" && "🔴 "}
+              {level}
+            </Button>
+          ))}
         </motion.div>
 
         {/* Tabs */}
