@@ -39,13 +39,14 @@ const difficultyColors = {
 const Meals = () => {
   const [activeTab, setActiveTab] = useState("breakfast");
   const [searchQuery, setSearchQuery] = useState("");
+  const [difficultyFilter, setDifficultyFilter] = useState<"All" | "Easy" | "Medium" | "Hard">("All");
   const { profile } = useProfile();
   const [selectedRecipe, setSelectedRecipe] = useState<RecipeDetail | null>(null);
   const [recipeSheetOpen, setRecipeSheetOpen] = useState(false);
 
-  const filteredMeals = mockMeals.filter((meal) =>
-    meal.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredMeals = mockMeals
+    .filter((meal) => meal.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    .filter((meal) => difficultyFilter === "All" || meal.difficulty === difficultyFilter);
 
   const handleMealClick = (mealName: string) => {
     const recipe = recipeDetails[mealName];
