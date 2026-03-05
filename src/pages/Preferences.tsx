@@ -53,6 +53,9 @@ const Preferences = () => {
     lunch_time: "12:30",
     dinner_time: "19:00",
   });
+  const [aiPantryMeals, setAiPantryMeals] = useState(true);
+  const [budgetMode, setBudgetMode] = useState(false);
+  const [weeklyBudget, setWeeklyBudget] = useState("50");
   const [saving, setSaving] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
