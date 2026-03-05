@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Check, Save, Target, Apple, Clock, Loader2 } from "lucide-react";
+import { ArrowLeft, Check, Save, Target, Apple, Clock, Loader2, Sparkles, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -52,6 +53,9 @@ const Preferences = () => {
     lunch_time: "12:30",
     dinner_time: "19:00",
   });
+  const [aiPantryMeals, setAiPantryMeals] = useState(true);
+  const [budgetMode, setBudgetMode] = useState(false);
+  const [weeklyBudget, setWeeklyBudget] = useState("50");
   const [saving, setSaving] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
@@ -223,6 +227,57 @@ const Preferences = () => {
                   />
                 </div>
               ))}
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* AI & Budget Options */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+          <Card>
+            <CardContent className="p-4 space-y-4">
+              <div className="flex items-center gap-2 mb-1">
+                <Sparkles className="h-5 w-5 text-primary" />
+                <h3 className="font-semibold">Smart Suggestions</h3>
+              </div>
+
+              {/* AI Pantry Meals Toggle */}
+              <div className="flex items-center justify-between p-3 rounded-xl border border-border">
+                <div className="flex-1">
+                  <Label className="font-medium">AI meals from pantry</Label>
+                  <p className="text-xs text-muted-foreground mt-0.5">Suggest meals using ingredients you already have</p>
+                </div>
+                <Switch checked={aiPantryMeals} onCheckedChange={setAiPantryMeals} />
+              </div>
+
+              {/* Budget Mode Toggle */}
+              <div className="flex items-center justify-between p-3 rounded-xl border border-border">
+                <div className="flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <Wallet className="h-4 w-4 text-secondary" />
+                    <Label className="font-medium">Budget-friendly meals</Label>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-0.5">Get meal suggestions within your budget</p>
+                </div>
+                <Switch checked={budgetMode} onCheckedChange={setBudgetMode} />
+              </div>
+
+              {budgetMode && (
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50">
+                  <span className="text-sm text-muted-foreground">Weekly budget</span>
+                  <div className="flex items-center gap-1">
+                    <span className="text-sm font-medium">$</span>
+                    <Input
+                      type="number"
+                      value={weeklyBudget}
+                      onChange={(e) => setWeeklyBudget(e.target.value)}
+                      className="w-20 h-8 text-center text-sm font-bold"
+                      min={10}
+                      max={500}
+                    />
+                  </div>
+                  <span className="text-xs text-muted-foreground">/ week</span>
+                </div>
+              )}
             </CardContent>
           </Card>
         </motion.div>

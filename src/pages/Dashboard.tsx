@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Flame, Award, ChevronRight, Plus, Droplets, TrendingUp } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Flame, Award, ChevronRight, Plus, Droplets, TrendingUp, ChevronDown } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -25,6 +25,7 @@ const Dashboard = () => {
   const [recipeSheetOpen, setRecipeSheetOpen] = useState(false);
   const [selectedMealLogged, setSelectedMealLogged] = useState(false);
   const [waterGlasses, setWaterGlasses] = useState(5);
+  const [showMacros, setShowMacros] = useState(true);
 
   const [extraCalories, setExtraCalories] = useState(0);
   const [extraMeals, setExtraMeals] = useState<Array<{ name: string; calories: number; type: string }>>([]);
@@ -143,29 +144,54 @@ const Dashboard = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="grid grid-cols-3 gap-2 sm:gap-3"
         >
-          <MacroCard
-            label="Protein"
-            current={macros.protein.current}
-            goal={macros.protein.goal}
-            unit="g"
-            color="protein"
-          />
-          <MacroCard
-            label="Carbs"
-            current={macros.carbs.current}
-            goal={macros.carbs.goal}
-            unit="g"
-            color="carbs"
-          />
-          <MacroCard
-            label="Fats"
-            current={macros.fats.current}
-            goal={macros.fats.goal}
-            unit="g"
-            color="fats"
-          />
+          <button
+            onClick={() => setShowMacros(!showMacros)}
+            className="flex items-center justify-between w-full mb-2"
+          >
+            <span className="text-sm font-semibold text-muted-foreground">Macros</span>
+            <motion.div
+              animate={{ rotate: showMacros ? 180 : 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+            </motion.div>
+          </button>
+          <AnimatePresence>
+            {showMacros && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="overflow-hidden"
+              >
+                <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                  <MacroCard
+                    label="Protein"
+                    current={macros.protein.current}
+                    goal={macros.protein.goal}
+                    unit="g"
+                    color="protein"
+                  />
+                  <MacroCard
+                    label="Carbs"
+                    current={macros.carbs.current}
+                    goal={macros.carbs.goal}
+                    unit="g"
+                    color="carbs"
+                  />
+                  <MacroCard
+                    label="Fats"
+                    current={macros.fats.current}
+                    goal={macros.fats.goal}
+                    unit="g"
+                    color="fats"
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
 
         {/* Today's Meals */}

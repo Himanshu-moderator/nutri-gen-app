@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Clock, ChefHat, Flame, Filter, Search } from "lucide-react";
+import { Sparkles, Clock, ChefHat, Flame, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -39,13 +39,14 @@ const difficultyColors = {
 const Meals = () => {
   const [activeTab, setActiveTab] = useState("breakfast");
   const [searchQuery, setSearchQuery] = useState("");
+  const [difficultyFilter, setDifficultyFilter] = useState<"All" | "Easy" | "Medium" | "Hard">("All");
   const { profile } = useProfile();
   const [selectedRecipe, setSelectedRecipe] = useState<RecipeDetail | null>(null);
   const [recipeSheetOpen, setRecipeSheetOpen] = useState(false);
 
-  const filteredMeals = mockMeals.filter((meal) =>
-    meal.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredMeals = mockMeals
+    .filter((meal) => meal.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    .filter((meal) => difficultyFilter === "All" || meal.difficulty === difficultyFilter);
 
   const handleMealClick = (mealName: string) => {
     const recipe = recipeDetails[mealName];
@@ -83,13 +84,29 @@ const Meals = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10 pr-12 h-11 sm:h-12 rounded-xl"
           />
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute right-1 top-1/2 -translate-y-1/2"
-          >
-            <Filter className="h-5 w-5" />
-          </Button>
+        </motion.div>
+
+        {/* Difficulty Filter */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="flex gap-2"
+        >
+          {(["All", "Easy", "Medium", "Hard"] as const).map((level) => (
+            <Button
+              key={level}
+              variant={difficultyFilter === level ? "default" : "outline"}
+              size="sm"
+              className="rounded-full text-xs"
+              onClick={() => setDifficultyFilter(level)}
+            >
+              {level === "Easy" && "🟢 "}
+              {level === "Medium" && "🟡 "}
+              {level === "Hard" && "🔴 "}
+              {level}
+            </Button>
+          ))}
         </motion.div>
 
         {/* Tabs */}
