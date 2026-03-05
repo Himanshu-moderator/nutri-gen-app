@@ -99,19 +99,19 @@ const Dashboard = () => {
           </TooltipProvider>
         </motion.div>
 
-        {/* Calorie Ring */}
+        {/* Daily Goal Card with Macros inside */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.1 }}
         >
           <Card className="border-0 shadow-lg overflow-hidden">
-            <CardContent className="p-4 sm:p-6">
+            <CardContent className="p-5 sm:p-7">
               <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
                 <CalorieRing
                   consumed={caloriesConsumed}
                   goal={calorieGoal}
-                  size={120}
+                  size={130}
                 />
                 <div className="flex-1 space-y-3 text-center sm:text-left">
                   <div>
@@ -135,63 +135,59 @@ const Dashboard = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Collapsible Macros */}
+              <div className="mt-4 pt-4 border-t border-border/50">
+                <button
+                  onClick={() => setShowMacros(!showMacros)}
+                  className="flex items-center justify-between w-full mb-2"
+                >
+                  <span className="text-xs font-semibold text-muted-foreground">Macros</span>
+                  <motion.div
+                    animate={{ rotate: showMacros ? 180 : 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                  </motion.div>
+                </button>
+                <AnimatePresence>
+                  {showMacros && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.25 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                        <MacroCard
+                          label="Protein"
+                          current={macros.protein.current}
+                          goal={macros.protein.goal}
+                          unit="g"
+                          color="protein"
+                        />
+                        <MacroCard
+                          label="Carbs"
+                          current={macros.carbs.current}
+                          goal={macros.carbs.goal}
+                          unit="g"
+                          color="carbs"
+                        />
+                        <MacroCard
+                          label="Fats"
+                          current={macros.fats.current}
+                          goal={macros.fats.goal}
+                          unit="g"
+                          color="fats"
+                        />
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </CardContent>
           </Card>
-        </motion.div>
-
-        {/* Macros */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <button
-            onClick={() => setShowMacros(!showMacros)}
-            className="flex items-center justify-between w-full mb-2"
-          >
-            <span className="text-sm font-semibold text-muted-foreground">Macros</span>
-            <motion.div
-              animate={{ rotate: showMacros ? 180 : 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              <ChevronDown className="h-4 w-4 text-muted-foreground" />
-            </motion.div>
-          </button>
-          <AnimatePresence>
-            {showMacros && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="overflow-hidden"
-              >
-                <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                  <MacroCard
-                    label="Protein"
-                    current={macros.protein.current}
-                    goal={macros.protein.goal}
-                    unit="g"
-                    color="protein"
-                  />
-                  <MacroCard
-                    label="Carbs"
-                    current={macros.carbs.current}
-                    goal={macros.carbs.goal}
-                    unit="g"
-                    color="carbs"
-                  />
-                  <MacroCard
-                    label="Fats"
-                    current={macros.fats.current}
-                    goal={macros.fats.goal}
-                    unit="g"
-                    color="fats"
-                  />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </motion.div>
 
         {/* Today's Meals */}
@@ -241,7 +237,6 @@ const Dashboard = () => {
                 });
               }}
             />
-            {/* Dynamically added meals */}
             {extraMeals.map((meal, index) => (
               <MealCard
                 key={`extra-${index}`}
