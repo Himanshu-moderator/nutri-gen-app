@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Check, Save, Target, Apple, Clock, Loader2, Sparkles, Wallet } from "lucide-react";
+import { ArrowLeft, Check, Save, Target, Apple, Clock, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,8 @@ import {
 import AppLayout from "@/components/AppLayout";
 import { useProfile } from "@/hooks/useProfile";
 import { useToast } from "@/hooks/use-toast";
+import { AUTOFILL_PANTRY_KEY, PREFER_PANTRY_KEY, useLocalPreference } from "@/hooks/useLocalPreference";
+import { recommendedCalories } from "@/lib/nutrition";
 
 const healthGoals = [
   { value: "lose_weight", label: "Lose Weight", emoji: "🏃" },
@@ -53,9 +55,8 @@ const Preferences = () => {
     lunch_time: "12:30",
     dinner_time: "19:00",
   });
-  const [aiPantryMeals, setAiPantryMeals] = useState(true);
-  const [budgetMode, setBudgetMode] = useState(false);
-  const [weeklyBudget, setWeeklyBudget] = useState("50");
+  const [preferPantry, setPreferPantry] = useLocalPreference(PREFER_PANTRY_KEY, true);
+  const [autofillPantry, setAutofillPantry] = useLocalPreference(AUTOFILL_PANTRY_KEY, true);
   const [saving, setSaving] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
@@ -95,13 +96,27 @@ const Preferences = () => {
     );
   };
 
+  const recommended = recommendedCalories(
+    profile ? { ...profile, health_goal: selectedGoal || profile.health_goal } : null
+  );
+
   const handleSave = async () => {
+    const calories = parseInt(calorieTarget);
+    if (!Number.isFinite(calories) || calories < 800 || calories > 6000) {
+      toast({
+        title: "Check your calorie target",
+        description: "Enter a daily target between 800 and 6000 kcal.",
+        variant: "destructive",
+      });
+      setShowConfirm(false);
+      return;
+    }
     setSaving(true);
     try {
       await updateProfile.mutateAsync({
         health_goal: selectedGoal || null,
         dietary_preferences: selectedDiets,
-        daily_calorie_target: parseInt(calorieTarget) || 2000,
+        daily_calorie_target: calories,
         breakfast_time: times.breakfast_time,
         lunch_time: times.lunch_time,
         dinner_time: times.dinner_time,
@@ -200,6 +215,27 @@ const Preferences = () => {
                 />
                 <span className="text-muted-foreground">kcal / day</span>
               </div>
+              {recommended ? (
+                <div className="flex items-center justify-between gap-3 rounded-xl bg-muted/50 p-3">
+                  <p className="text-xs text-muted-foreground">
+                    Estimated for your body stats, activity level and goal:{" "}
+                    <span className="font-semibold text-foreground">{recommended} kcal</span>
+                  </p>
+                  {calorieTarget !== String(recommended) && (
+                    <Button size="sm" variant="outline" onClick={() => setCalorieTarget(String(recommended))}>
+                      Use this
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  Add your height, weight and birthday in{" "}
+                  <button className="text-primary underline" onClick={() => navigate("/edit-profile")}>
+                    Edit Profile
+                  </button>{" "}
+                  to get a personalised estimate.
+                </p>
+              )}
             </CardContent>
           </Card>
         </motion.div>
@@ -240,44 +276,26 @@ const Preferences = () => {
                 <h3 className="font-semibold">Smart Suggestions</h3>
               </div>
 
-              {/* AI Pantry Meals Toggle */}
               <div className="flex items-center justify-between p-3 rounded-xl border border-border">
-                <div className="flex-1">
-                  <Label className="font-medium">AI meals from pantry</Label>
-                  <p className="text-xs text-muted-foreground mt-0.5">Suggest meals using ingredients you already have</p>
+                <div className="flex-1 pr-3">
+                  <Label htmlFor="prefer-pantry" className="font-medium">Prioritise my pantry</Label>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Show meals that use ingredients you already have first
+                  </p>
                 </div>
-                <Switch checked={aiPantryMeals} onCheckedChange={setAiPantryMeals} />
+                <Switch id="prefer-pantry" checked={preferPantry} onCheckedChange={setPreferPantry} />
               </div>
 
-              {/* Budget Mode Toggle */}
               <div className="flex items-center justify-between p-3 rounded-xl border border-border">
-                <div className="flex-1">
-                  <div className="flex items-center gap-1.5">
-                    <Wallet className="h-4 w-4 text-secondary" />
-                    <Label className="font-medium">Budget-friendly meals</Label>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">Get meal suggestions within your budget</p>
+                <div className="flex-1 pr-3">
+                  <Label htmlFor="autofill-pantry" className="font-medium">Auto-fill pantry details</Label>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    When you add an item, NutriGen fills in its category and expiry date for you. Photo scan always
+                    does this.
+                  </p>
                 </div>
-                <Switch checked={budgetMode} onCheckedChange={setBudgetMode} />
+                <Switch id="autofill-pantry" checked={autofillPantry} onCheckedChange={setAutofillPantry} />
               </div>
-
-              {budgetMode && (
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50">
-                  <span className="text-sm text-muted-foreground">Weekly budget</span>
-                  <div className="flex items-center gap-1">
-                    <span className="text-sm font-medium">$</span>
-                    <Input
-                      type="number"
-                      value={weeklyBudget}
-                      onChange={(e) => setWeeklyBudget(e.target.value)}
-                      className="w-20 h-8 text-center text-sm font-bold"
-                      min={10}
-                      max={500}
-                    />
-                  </div>
-                  <span className="text-xs text-muted-foreground">/ week</span>
-                </div>
-              )}
             </CardContent>
           </Card>
         </motion.div>

@@ -1,1 +1,6 @@
 project_id = "oudnwphnqakcszkimsob"
+
+# Open to the public app (including demo mode, which has no signed-in user).
+# The function accepts no secrets from callers and validates every input.
+[functions.nutrigen-ai]
+verify_jwt = false

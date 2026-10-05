@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Sparkles, Coffee, Sun, Moon, Cookie, Sandwich, Plus, ChevronDown, ChevronUp, Clock, Flame } from "lucide-react";
+import { Check, Sparkles, Coffee, Sun, Moon, Cookie, Sandwich, Plus, ChevronDown, ChevronUp, Clock, Flame, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { recipeDetails, quickMealRecipes } from "@/data/mockRecipes";
+import { findRecipe } from "@/lib/recipes";
 
 interface MealCardProps {
   type: "breakfast" | "lunch" | "dinner" | "snack" | string;
@@ -14,6 +14,8 @@ interface MealCardProps {
   suggested?: boolean;
   onClick?: () => void;
   onAddToToday?: () => void;
+  onDelete?: () => void;
+  note?: string;
 }
 
 const typeIcons: Record<string, any> = {
@@ -32,13 +34,13 @@ const typeLabels: Record<string, string> = {
   brunch: "Brunch",
 };
 
-const MealCard = ({ type, name, calories, time, logged, suggested, onClick, onAddToToday }: MealCardProps) => {
+const MealCard = ({ type, name, calories, time, logged, suggested, onClick, onAddToToday, onDelete, note }: MealCardProps) => {
   const Icon = typeIcons[type] || Cookie;
   const isUpcoming = !logged;
   const [expanded, setExpanded] = useState(false);
 
   // Find recipe for preview
-  const recipe = recipeDetails[name] || quickMealRecipes[name] || null;
+  const recipe = findRecipe(name);
 
   const handleTogglePreview = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -81,7 +83,7 @@ const MealCard = ({ type, name, calories, time, logged, suggested, onClick, onAd
             {suggested && (
               <span className="inline-flex items-center gap-1 text-xs font-medium text-primary">
                 <Sparkles className="h-3 w-3" />
-                AI Pick
+                Suggested
               </span>
             )}
             {logged && (
@@ -99,6 +101,7 @@ const MealCard = ({ type, name, calories, time, logged, suggested, onClick, onAd
             <span>•</span>
             <span>{time}</span>
           </div>
+          {note && <p className="text-xs text-primary mt-0.5">{note}</p>}
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
           {logged ? (
@@ -119,6 +122,18 @@ const MealCard = ({ type, name, calories, time, logged, suggested, onClick, onAd
               Add
             </Button>
           ) : null}
+          {logged && onDelete && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete();
+              }}
+              className="p-1.5 rounded-full hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+              aria-label={`Remove ${name}`}
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          )}
           {recipe && (
             <button
               onClick={handleTogglePreview}

@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight, Check, Target, Apple, Clock, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useProfile } from "@/hooks/useProfile";
+import { useAuth } from "@/contexts/AuthContext";
+import { clearOnboardingDraft, loadOnboardingDraft, saveOnboardingDraft } from "@/lib/onboardingDraft";
 import { useToast } from "@/hooks/use-toast";
 
 const steps = [
@@ -70,7 +72,23 @@ const Onboarding = () => {
   const [loading, setLoading] = useState(false);
   
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { updateProfile } = useProfile();
+  // Visitors without an account answer first; their answers are kept and saved
+  // to their profile once they sign up.
+  const isGuest = !user;
+
+  useEffect(() => {
+    const draft = loadOnboardingDraft();
+    if (!draft) return;
+    setSelectedGoal(draft.health_goal);
+    setSelectedDiets(draft.dietary_preferences);
+    setTimes({
+      breakfast_time: draft.breakfast_time,
+      lunch_time: draft.lunch_time,
+      dinner_time: draft.dinner_time,
+    });
+  }, []);
   const { toast } = useToast();
 
   const handleNext = () => {
@@ -86,6 +104,15 @@ const Onboarding = () => {
   };
 
   const handleComplete = async () => {
+    if (isGuest) {
+      saveOnboardingDraft({
+        health_goal: selectedGoal,
+        dietary_preferences: selectedDiets,
+        ...times,
+      });
+      navigate("/trial");
+      return;
+    }
     setLoading(true);
     try {
       await updateProfile.mutateAsync({
@@ -96,6 +123,7 @@ const Onboarding = () => {
         dinner_time: times.dinner_time,
         onboarding_completed: true,
       });
+      clearOnboardingDraft();
       navigate("/dashboard");
     } catch (error: any) {
       toast({
@@ -136,11 +164,12 @@ const Onboarding = () => {
       {/* Progress bar */}
       <div className="p-4">
         <div className="flex items-center gap-2 mb-4">
-          {currentStep > 0 && (
+          {(currentStep > 0 || isGuest) && (
             <Button
               variant="ghost"
               size="icon"
-              onClick={handleBack}
+              aria-label="Back"
+              onClick={currentStep > 0 ? handleBack : () => navigate("/")}
               className="rounded-full"
             >
               <ArrowLeft className="h-5 w-5" />
@@ -259,7 +288,9 @@ const Onboarding = () => {
                   <p className="text-lg font-medium">Your profile is ready!</p>
                   <p className="text-muted-foreground">
                     We've personalized NutriGen based on your preferences.
-                    Start exploring meal suggestions tailored just for you.
+                    {isGuest
+                      ? " Next, start your free trial so your plan is saved to your account."
+                      : " Start exploring meal suggestions tailored just for you."}
                   </p>
                 </div>
               </div>
@@ -283,7 +314,7 @@ const Onboarding = () => {
                 disabled={loading}
                 className="w-full gradient-primary text-primary-foreground h-14 text-base font-semibold rounded-2xl"
               >
-                {loading ? "Setting up..." : "Get Started"}
+                {loading ? "Setting up..." : isGuest ? "Continue" : "Get Started"}
                 <Sparkles className="ml-2 h-5 w-5" />
               </Button>
             )}

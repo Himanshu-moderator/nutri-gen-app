@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Camera, Save, Phone, Mail, User, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Mail, User, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,7 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 const EditProfile = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isDemo } = useAuth();
   const { profile, updateProfile } = useProfile();
   const { toast } = useToast();
 
@@ -26,7 +26,6 @@ const EditProfile = () => {
   const [heightCm, setHeightCm] = useState("");
   const [weightKg, setWeightKg] = useState("");
   const [activityLevel, setActivityLevel] = useState("");
-  const [phone, setPhone] = useState("");
   const [newEmail, setNewEmail] = useState("");
   const [saving, setSaving] = useState(false);
   const [emailChanging, setEmailChanging] = useState(false);
@@ -42,19 +41,36 @@ const EditProfile = () => {
     }
     if (user) {
       setNewEmail(user.email || "");
-      setPhone(user.phone || "");
     }
   }, [profile, user]);
 
   const handleSave = async () => {
+    const invalid = (description: string) =>
+      toast({ title: "Check your details", description, variant: "destructive" });
+
+    if (!fullName.trim()) return invalid("Please enter your name.");
+    if (heightCm && (Number(heightCm) < 50 || Number(heightCm) > 260)) {
+      return invalid("Height should be between 50 and 260 cm.");
+    }
+    if (weightKg && (Number(weightKg) < 20 || Number(weightKg) > 400)) {
+      return invalid("Weight should be between 20 and 400 kg.");
+    }
+    if (dateOfBirth) {
+      const dob = new Date(dateOfBirth);
+      const now = new Date();
+      const age = now.getFullYear() - dob.getFullYear();
+      if (Number.isNaN(dob.getTime()) || dob > now || age > 110) {
+        return invalid("Please enter a valid date of birth.");
+      }
+    }
     setSaving(true);
     try {
       await updateProfile.mutateAsync({
-        full_name: fullName,
+        full_name: fullName.trim(),
         gender: gender || null,
         date_of_birth: dateOfBirth || null,
-        height_cm: heightCm ? parseInt(heightCm) : null,
-        weight_kg: weightKg ? parseFloat(weightKg) : null,
+        height_cm: heightCm ? Math.round(Number(heightCm)) : null,
+        weight_kg: weightKg ? Number(weightKg) : null,
         activity_level: activityLevel || null,
       });
       toast({ title: "Profile updated!", description: "Your changes have been saved." });
@@ -68,6 +84,10 @@ const EditProfile = () => {
 
   const handleEmailChange = async () => {
     if (!newEmail || newEmail === user?.email) return;
+    if (isDemo) {
+      toast({ title: "Not available in demo", description: "Create an account to change your email." });
+      return;
+    }
     setEmailChanging(true);
     try {
       const { error } = await supabase.auth.updateUser({ email: newEmail });
@@ -80,20 +100,6 @@ const EditProfile = () => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } finally {
       setEmailChanging(false);
-    }
-  };
-
-  const handlePhoneUpdate = async () => {
-    if (!phone) return;
-    try {
-      const { error } = await supabase.auth.updateUser({ phone });
-      if (error) throw error;
-      toast({
-        title: "Phone updated!",
-        description: "A verification code has been sent to your phone.",
-      });
-    } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
     }
   };
 
@@ -126,14 +132,7 @@ const EditProfile = () => {
                 {fullName?.charAt(0) || user?.email?.charAt(0)?.toUpperCase() || "U"}
               </AvatarFallback>
             </Avatar>
-            <button
-              className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg"
-              onClick={() => toast({ title: "Coming soon!", description: "Photo upload will be available soon." })}
-            >
-              <Camera className="h-4 w-4" />
-            </button>
           </div>
-          <p className="text-sm text-muted-foreground">Tap camera to change photo</p>
         </motion.div>
 
         {/* Personal Info */}
@@ -207,7 +206,7 @@ const EditProfile = () => {
                 <div className="flex gap-2">
                   <div className="relative flex-1">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input id="email" type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} className="pl-10" />
+                    <Input id="email" type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} className="pl-10" disabled={isDemo} />
                   </div>
                   {newEmail !== user?.email && (
                     <Button onClick={handleEmailChange} disabled={emailChanging} size="sm" variant="outline" className="shrink-0">
@@ -215,24 +214,13 @@ const EditProfile = () => {
                     </Button>
                   )}
                 </div>
-                <p className="text-xs text-muted-foreground">Changing email requires verification via both old and new email.</p>
+                <p className="text-xs text-muted-foreground">
+                  {isDemo
+                    ? "Email can't be changed in demo mode."
+                    : "Changing email requires verification via both old and new email."}
+                </p>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
-                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="pl-10" placeholder="+1 (555) 000-0000" />
-                  </div>
-                  {phone && phone !== user?.phone && (
-                    <Button onClick={handlePhoneUpdate} size="sm" variant="outline" className="shrink-0">
-                      Verify
-                    </Button>
-                  )}
-                </div>
-                <p className="text-xs text-muted-foreground">Phone verification via OTP will be sent to your number.</p>
-              </div>
             </CardContent>
           </Card>
         </motion.div>

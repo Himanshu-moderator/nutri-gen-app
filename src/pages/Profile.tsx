@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   User,
@@ -31,16 +31,24 @@ import {
 import AppLayout from "@/components/AppLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
+import { useMealLogs } from "@/hooks/useMealLogs";
+import { useLocalPreference } from "@/hooks/useLocalPreference";
+import { currentStreak } from "@/lib/nutrition";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
 const Profile = () => {
-  const { user, signOut } = useAuth();
+  const { user, signOut, isDemo } = useAuth();
   const { profile, trialDaysRemaining, isTrialActive } = useProfile();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [darkMode, setDarkMode] = useState(false);
-  const [notifications, setNotifications] = useState(true);
+  const { logs } = useMealLogs();
+  const streak = currentStreak(logs);
+  const [darkMode, setDarkMode] = useLocalPreference("nutrigen_dark_mode", false);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", darkMode);
+  }, [darkMode]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -87,7 +95,7 @@ const Profile = () => {
           <div>
             <h1 className="text-xl font-bold">{profile?.full_name || "User"}</h1>
             <p className="text-sm text-muted-foreground">{user?.email}</p>
-            {isTrialActive() && (
+            {!isDemo && isTrialActive() && (
               <span className="inline-flex items-center gap-1 text-xs font-medium text-primary mt-1">
                 <Crown className="h-3 w-3" />
                 Trial Active
@@ -97,7 +105,7 @@ const Profile = () => {
         </motion.div>
 
         {/* Trial Status */}
-        {isTrialActive() && (
+        {!isDemo && isTrialActive() && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -135,7 +143,7 @@ const Profile = () => {
             <CardContent className="p-4 text-center">
               <Target className="h-6 w-6 mx-auto text-primary mb-2" />
               <p className="text-xs text-muted-foreground">Goal</p>
-              <p className="text-sm font-medium truncate">
+              <p className="text-sm font-medium leading-tight">
                 {healthGoalLabels[profile?.health_goal || ""] || "Not set"}
               </p>
             </CardContent>
@@ -153,7 +161,9 @@ const Profile = () => {
             <CardContent className="p-4 text-center">
               <Activity className="h-6 w-6 mx-auto text-accent mb-2" />
               <p className="text-xs text-muted-foreground">Streak</p>
-              <p className="text-sm font-medium">7 days 🔥</p>
+              <p className="text-sm font-medium">
+                {streak} {streak === 1 ? "day" : "days"}{streak > 0 ? " 🔥" : ""}
+              </p>
             </CardContent>
           </Card>
         </motion.div>
@@ -204,7 +214,7 @@ const Profile = () => {
           <Card>
             <CardContent className="p-0 divide-y divide-border">
               <button
-                className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
+                className="w-full flex items-center justify-between p-4 text-foreground hover:bg-muted/50 transition-colors"
                 onClick={() => navigate("/edit-profile")}
               >
                 <div className="flex items-center gap-3">
@@ -219,7 +229,7 @@ const Profile = () => {
                   <Bell className="h-5 w-5 text-muted-foreground" />
                   <span>Notifications</span>
                 </div>
-                <Switch checked={notifications} onCheckedChange={setNotifications} />
+                <span className="text-xs text-muted-foreground">Coming soon</span>
               </div>
 
               <div className="flex items-center justify-between p-4">
@@ -227,17 +237,11 @@ const Profile = () => {
                   <Moon className="h-5 w-5 text-muted-foreground" />
                   <span>Dark Mode</span>
                 </div>
-                <Switch
-                  checked={darkMode}
-                  onCheckedChange={(checked) => {
-                    setDarkMode(checked);
-                    document.documentElement.classList.toggle("dark", checked);
-                  }}
-                />
+                <Switch checked={darkMode} onCheckedChange={setDarkMode} aria-label="Dark mode" />
               </div>
 
               <button
-                className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
+                className="w-full flex items-center justify-between p-4 text-foreground hover:bg-muted/50 transition-colors"
                 onClick={() => navigate("/preferences")}
               >
                 <div className="flex items-center gap-3">
@@ -256,14 +260,16 @@ const Profile = () => {
                 className="w-full justify-start gap-3 text-destructive hover:text-destructive hover:bg-destructive/10"
               >
                 <LogOut className="h-5 w-5" />
-                Sign Out
+                {isDemo ? "Exit demo" : "Sign Out"}
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Sign out?</AlertDialogTitle>
+                <AlertDialogTitle>{isDemo ? "Exit the demo?" : "Sign out?"}</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Are you sure you want to sign out of your account? You'll need to log in again to access your data.
+                  {isDemo
+                    ? "Your demo data will be cleared from this browser."
+                    : "Are you sure you want to sign out of your account? You'll need to log in again to access your data."}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -272,7 +278,7 @@ const Profile = () => {
                   onClick={handleSignOut}
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 >
-                  Sign Out
+                  {isDemo ? "Exit demo" : "Sign Out"}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { nextMealSlot } from "@/lib/nutrition";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Plus, Flame, Clock, ChefHat, Coffee, Sun, Moon, Cookie, Sandwich, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -50,7 +51,7 @@ const quickMeals: QuickMeal[] = [
 interface AddMealSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onMealAdded?: (meal: { name: string; calories: number; type: string; protein: number; carbs: number; fats: number }) => void;
+  onMealAdded?: (meal: { name: string; calories: number; type: string; protein: number; carbs: number; fats: number }) => void | Promise<void>;
 }
 
 const AddMealSheet = ({ open, onOpenChange, onMealAdded }: AddMealSheetProps) => {
@@ -65,23 +66,77 @@ const AddMealSheet = ({ open, onOpenChange, onMealAdded }: AddMealSheetProps) =>
     meal.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleAddMeal = (meal: QuickMeal) => {
-    onMealAdded?.({
+  const [showCustom, setShowCustom] = useState(false);
+  const [custom, setCustom] = useState({ name: "", calories: "", protein: "", carbs: "", fats: "" });
+  const [saving, setSaving] = useState(false);
+
+  // Start on the meal that fits the time of day each time the sheet opens.
+  useEffect(() => {
+    if (open) {
+      setSelectedType(nextMealSlot());
+      setShowCustom(false);
+    }
+  }, [open]);
+
+  const logMeal = async (meal: {
+    name: string;
+    calories: number;
+    protein: number;
+    carbs: number;
+    fats: number;
+  }) => {
+    if (saving) return;
+    setSaving(true);
+    try {
+      await onMealAdded?.({ ...meal, type: selectedType });
+      toast({
+        title: "Meal added! 🎉",
+        description: `${meal.name} (${meal.calories} cal) added as ${selectedType}`,
+      });
+      setRecipeSheetOpen(false);
+      onOpenChange(false);
+      setSearchQuery("");
+      setPendingMeal(null);
+      setCustom({ name: "", calories: "", protein: "", carbs: "", fats: "" });
+    } catch (error) {
+      toast({
+        title: "Couldn't add meal",
+        description: error instanceof Error ? error.message : "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleAddMeal = (meal: QuickMeal) =>
+    logMeal({
       name: meal.name,
       calories: meal.calories,
-      type: selectedType,
       protein: meal.protein,
       carbs: meal.carbs,
       fats: meal.fats,
     });
-    toast({
-      title: "Meal added! 🎉",
-      description: `${meal.name} (${meal.calories} cal) added as ${selectedType}`,
+
+  const handleAddCustom = () => {
+    const calories = Number(custom.calories);
+    const name = custom.name.trim();
+    if (!name || !Number.isFinite(calories) || calories <= 0 || calories > 5000) {
+      toast({
+        title: "Check the details",
+        description: "Give the meal a name and calories between 1 and 5000.",
+        variant: "destructive",
+      });
+      return;
+    }
+    const grams = (v: string) => Math.max(0, Math.min(Number(v) || 0, 500));
+    logMeal({
+      name,
+      calories,
+      protein: grams(custom.protein),
+      carbs: grams(custom.carbs),
+      fats: grams(custom.fats),
     });
-    setRecipeSheetOpen(false);
-    onOpenChange(false);
-    setSearchQuery("");
-    setPendingMeal(null);
   };
 
   const handleViewRecipe = (meal: QuickMeal) => {
@@ -197,6 +252,56 @@ const AddMealSheet = ({ open, onOpenChange, onMealAdded }: AddMealSheetProps) =>
                     ))
                   )}
                 </AnimatePresence>
+              </div>
+
+              {/* Custom meal */}
+              <div className="rounded-2xl border border-dashed border-border p-4 space-y-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCustom((v) => !v);
+                    if (!showCustom && searchQuery && !custom.name) {
+                      setCustom((c) => ({ ...c, name: searchQuery }));
+                    }
+                  }}
+                  className="flex w-full items-center justify-between text-sm font-medium"
+                >
+                  <span>Can't find it? Add your own meal</span>
+                  <Plus className={`h-4 w-4 transition-transform ${showCustom ? "rotate-45" : ""}`} />
+                </button>
+                {showCustom && (
+                  <div className="space-y-3">
+                    <Input
+                      placeholder="Meal name"
+                      aria-label="Meal name"
+                      value={custom.name}
+                      maxLength={80}
+                      onChange={(e) => setCustom({ ...custom, name: e.target.value })}
+                    />
+                    <div className="grid grid-cols-4 gap-2">
+                      {([
+                        ["calories", "Calories"],
+                        ["protein", "Protein g"],
+                        ["carbs", "Carbs g"],
+                        ["fats", "Fats g"],
+                      ] as const).map(([field, label]) => (
+                        <Input
+                          key={field}
+                          type="number"
+                          inputMode="numeric"
+                          min={0}
+                          placeholder={label}
+                          aria-label={label}
+                          value={custom[field]}
+                          onChange={(e) => setCustom({ ...custom, [field]: e.target.value })}
+                        />
+                      ))}
+                    </div>
+                    <Button className="w-full" onClick={handleAddCustom} disabled={saving}>
+                      {saving ? "Adding..." : `Log as ${selectedType}`}
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
