@@ -7,6 +7,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { useAuth } from "@/contexts/AuthContext";
 import { clearOnboardingDraft, loadOnboardingDraft, saveOnboardingDraft } from "@/lib/onboardingDraft";
 import { useToast } from "@/hooks/use-toast";
+import { getErrorMessage } from "@/lib/utils";
 
 const steps = [
   {
@@ -116,7 +117,7 @@ const Onboarding = () => {
     setLoading(true);
     try {
       await updateProfile.mutateAsync({
-        health_goal: selectedGoal as any,
+        health_goal: selectedGoal,
         dietary_preferences: selectedDiets,
         breakfast_time: times.breakfast_time,
         lunch_time: times.lunch_time,
@@ -125,10 +126,10 @@ const Onboarding = () => {
       });
       clearOnboardingDraft();
       navigate("/dashboard");
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Error",
-        description: error.message || "Failed to save preferences",
+        description: getErrorMessage(error, "Failed to save preferences"),
         variant: "destructive",
       });
     } finally {

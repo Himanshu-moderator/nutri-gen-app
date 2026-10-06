@@ -28,12 +28,17 @@ export const DEFAULT_MODEL = "gemini-3.8-flash";
 // model is overloaded (it answers 503 in busy periods).
 export const FAST_MODEL = "gemini-flash-lite-latest";
 const MAX_IMAGE_BASE64 = 6_000_000; // ~4.5 MB of image data
+// Without a limit a stalled Gemini call would hold the request until the platform cuts it at 150 s.
+const ATTEMPT_TIMEOUT_MS = 30_000;
+// Deno has AbortSignal.timeout; the jsdom test environment does not, so skip the limit there.
+const timeoutSignal = (ms: number) => (typeof AbortSignal.timeout === "function" ? AbortSignal.timeout(ms) : undefined);
 const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
 
 export interface HandlerEnv {
   apiKey: string | undefined;
   model?: string;
   retryDelayMs?: number;
+  attemptTimeoutMs?: number;
 }
 
 const CORS = {
@@ -149,16 +154,23 @@ const callGemini = async (
   // Gemini briefly answers 503 ("high demand") now and then: retry, then fall back to a lighter model.
   let res: Response | undefined;
   for (let attempt = 0; attempt < tries.length; attempt++) {
+    const isLast = attempt === tries.length - 1;
     try {
       res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${tries[attempt]}:generateContent`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-goog-api-key": env.apiKey },
         body: request,
+        signal: timeoutSignal(env.attemptTimeoutMs ?? ATTEMPT_TIMEOUT_MS),
       });
-    } catch {
-      throw new HttpError(502, "Couldn't reach the AI service.");
+    } catch (err) {
+      const timedOut = err instanceof DOMException && (err.name === "TimeoutError" || err.name === "AbortError");
+      if (!timedOut) throw new HttpError(502, "Couldn't reach the AI service.");
+      if (isLast) throw new HttpError(504, "The AI took too long to answer. Please try again.");
+      // The model stalled: don't repeat it, go straight to the lighter one.
+      attempt = tries.length - 2;
+      continue;
     }
-    if (res.status !== 503 || attempt === tries.length - 1) break;
+    if (res.status !== 503 || isLast) break;
     await new Promise((resolve) => setTimeout(resolve, (env.retryDelayMs ?? 800) * (attempt + 1)));
   }
   if (!res) throw new HttpError(502, "Couldn't reach the AI service.");

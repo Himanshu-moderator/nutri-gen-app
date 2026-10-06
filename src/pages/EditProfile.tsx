@@ -12,6 +12,7 @@ import AppLayout from "@/components/AppLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { useToast } from "@/hooks/use-toast";
+import { getErrorMessage } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 
 const EditProfile = () => {
@@ -75,8 +76,8 @@ const EditProfile = () => {
       });
       toast({ title: "Profile updated!", description: "Your changes have been saved." });
       navigate("/profile");
-    } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } catch (error) {
+      toast({ title: "Error", description: getErrorMessage(error), variant: "destructive" });
     } finally {
       setSaving(false);
     }
@@ -96,8 +97,8 @@ const EditProfile = () => {
         title: "Verification sent!",
         description: "Check both your old and new email to confirm the change.",
       });
-    } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } catch (error) {
+      toast({ title: "Error", description: getErrorMessage(error), variant: "destructive" });
     } finally {
       setEmailChanging(false);
     }

@@ -152,6 +152,27 @@ describe("edge function handler", () => {
     expect(fetchSpy).toHaveBeenCalledTimes(2);
   });
 
+  it("falls back to the lighter model when Gemini stalls", async () => {
+    const ok = new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: '{"items":[]}' }] } }] }));
+    const fetchSpy = vi
+      .fn()
+      .mockRejectedValueOnce(new DOMException("timed out", "TimeoutError"))
+      .mockResolvedValueOnce(ok);
+    vi.stubGlobal("fetch", fetchSpy);
+    const res = await handleRequest(post({ action: "enrich", names: ["Milk"] }), { apiKey: "k", attemptTimeoutMs: 5 });
+    expect(res.status).toBe(200);
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+    expect(String(fetchSpy.mock.calls[1][0])).toContain("gemini-flash-lite-latest");
+  });
+
+  it("answers 504 quickly when every attempt stalls", async () => {
+    const fetchSpy = vi.fn().mockRejectedValue(new DOMException("timed out", "TimeoutError"));
+    vi.stubGlobal("fetch", fetchSpy);
+    const res = await handleRequest(post({ action: "enrich", names: ["Milk"] }), { apiKey: "k", attemptTimeoutMs: 5 });
+    expect(res.status).toBe(504);
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+  });
+
   it("maps upstream rate limits to 429 without leaking details", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("quota details", { status: 429 })));
     const res = await handleRequest(post({ action: "enrich", names: ["Milk"] }), { apiKey: "k" });

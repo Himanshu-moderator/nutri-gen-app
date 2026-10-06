@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Sparkles, Coffee, Sun, Moon, Cookie, Sandwich, Plus, ChevronDown, ChevronUp, Clock, Flame, Trash2 } from "lucide-react";
+import { Check, Sparkles, Coffee, Sun, Moon, Cookie, Sandwich, Plus, ChevronDown, ChevronUp, Clock, Flame, Trash2, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { findRecipe } from "@/lib/recipes";
@@ -18,7 +18,7 @@ interface MealCardProps {
   note?: string;
 }
 
-const typeIcons: Record<string, any> = {
+const typeIcons: Record<string, LucideIcon> = {
   breakfast: Coffee,
   lunch: Sun,
   dinner: Moon,

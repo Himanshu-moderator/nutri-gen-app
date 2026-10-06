@@ -20,6 +20,7 @@ import {
 import AppLayout from "@/components/AppLayout";
 import { useProfile } from "@/hooks/useProfile";
 import { useToast } from "@/hooks/use-toast";
+import { getErrorMessage } from "@/lib/utils";
 import { AUTOFILL_PANTRY_KEY, PREFER_PANTRY_KEY, useLocalPreference } from "@/hooks/useLocalPreference";
 import { recommendedCalories } from "@/lib/nutrition";
 
@@ -59,7 +60,6 @@ const Preferences = () => {
   const [autofillPantry, setAutofillPantry] = useLocalPreference(AUTOFILL_PANTRY_KEY, true);
   const [saving, setSaving] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -74,21 +74,15 @@ const Preferences = () => {
     }
   }, [profile]);
 
-  const checkChanges = () => {
-    if (!profile) return false;
-    return (
-      selectedGoal !== (profile.health_goal || "") ||
-      JSON.stringify(selectedDiets.sort()) !== JSON.stringify((profile.dietary_preferences || []).sort()) ||
+  const sortedKey = (list: string[]) => JSON.stringify([...list].sort());
+  const hasChanges =
+    !!profile &&
+    (selectedGoal !== (profile.health_goal || "") ||
+      sortedKey(selectedDiets) !== sortedKey(profile.dietary_preferences || []) ||
       calorieTarget !== (profile.daily_calorie_target?.toString() || "2000") ||
       times.breakfast_time !== (profile.breakfast_time?.slice(0, 5) || "08:00") ||
       times.lunch_time !== (profile.lunch_time?.slice(0, 5) || "12:30") ||
-      times.dinner_time !== (profile.dinner_time?.slice(0, 5) || "19:00")
-    );
-  };
-
-  useEffect(() => {
-    setHasChanges(checkChanges());
-  }, [selectedGoal, selectedDiets, calorieTarget, times, profile]);
+      times.dinner_time !== (profile.dinner_time?.slice(0, 5) || "19:00"));
 
   const toggleDiet = (diet: string) => {
     setSelectedDiets((prev) =>
@@ -124,8 +118,8 @@ const Preferences = () => {
       toast({ title: "Preferences saved!", description: "Your health goals and preferences have been updated." });
       setShowConfirm(false);
       navigate("/profile");
-    } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } catch (error) {
+      toast({ title: "Error", description: getErrorMessage(error), variant: "destructive" });
     } finally {
       setSaving(false);
     }
